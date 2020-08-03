@@ -48,6 +48,12 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     override fun onFling(e1: MotionEvent?, e2: MotionEvent?, p2: Float, p3: Float): Boolean {
+
+        Log.e("OnFling","e1.y"+e1!!.y)
+        Log.e("OnFling","e2.y"+e2!!.y)
+
+        return true
+        /*
         return when (getDirection(e1!!.x, e1.y, e2!!.x, e2.y)) {
             Direction.TOP -> {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -61,11 +67,22 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             Direction.RIGHT -> true
             else -> false
         }
+
+         */
+
+
     }
 
-    override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+    override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, p2: Float, p3: Float): Boolean {
 
-        return false
+        e1?.y?.let { startPos->
+            e2?.y?.let { endPos->
+                val fark = startPos - endPos
+                bottomSheetBehavior.peekHeight =  fark.toInt()
+            }
+        }
+        val startPos =
+        return true
     }
 
     override fun onLongPress(p0: MotionEvent?) {
