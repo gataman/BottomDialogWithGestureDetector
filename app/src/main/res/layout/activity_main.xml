@@ -7,28 +7,43 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Drag any where"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/bottomSheet"
-        android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:background="@color/colorAccent"
-        app:behavior_hideable="true"
-        app:behavior_peekHeight="55dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-        <TextView
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:alpha="0"
+            android:background="#000"
+            app:navigationIcon="@drawable/ic_launcher_foreground"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="deneme"/>
-    </androidx.core.widget.NestedScrollView>
+            android:layout_height="50dp" />
 
+<!--    <FrameLayout-->
+<!--        android:id="@+id/bottomSheet"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:background="@drawable/shape"-->
+<!--        android:paddingLeft="10dp"-->
+<!--        android:paddingRight="10dp"-->
+<!--        app:behavior_hideable="true"-->
+<!--       >-->
+
+<!--        <ListView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:entries="@array/Entries"-->
+<!--            android:layout_height="wrap_content">-->
+<!--        </ListView>-->
+
+
+<!--    </FrameLayout>-->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@drawable/shape"
+        android:id="@+id/bottomSheet">
+
+        <include layout="@layout/items" />
+    </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

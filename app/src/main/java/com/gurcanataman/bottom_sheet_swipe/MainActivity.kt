@@ -1,40 +1,124 @@
 package com.gurcanataman.bottom_sheet_swipe
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlin.math.atan2
+import java.lang.Math.atan2
 
 class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private lateinit var gestureDetector: GestureDetectorCompat
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<NestedScrollView>
 
     enum class Direction { TOP, DOWN, LEFT, RIGHT }
+    var isExpand:Boolean = false
 
+
+    var translateExpandLimit: Float = 0f
+    var screenHeight: Float = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+//        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         gestureDetector = GestureDetectorCompat(this, this)
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        screenHeight = displayMetrics.heightPixels.toFloat()
+        translateExpandLimit =
+            resources.getDimensionPixelSize(R.dimen.shr_product_grid_reveal_height).toFloat()
+
+        bottomSheet.translationY = screenHeight //
+
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        return if (gestureDetector.onTouchEvent(event)) {
-            true
-        } else {
-            super.onTouchEvent(event)
+
+
+
+    fun collapse() {
+        val animatorSet = AnimatorSet()
+
+        val animator = ObjectAnimator.ofFloat(
+            bottomSheet,
+            "translationY",
+            screenHeight.toFloat()
+        )
+        animator.duration = 200
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animatorSet.play(animator)
+        animator.start()
+        toolbar.alpha = 0f
+    }
+
+    fun expand() {
+        val animatorSet = AnimatorSet()
+
+        val animator = ObjectAnimator.ofFloat(
+            bottomSheet,
+            "translationY",
+            translateExpandLimit.toFloat()
+        )
+        animator.duration = 200
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animatorSet.play(animator)
+        animator.start()
+
+        toolbar.alpha = 1f
+    }
+
+
+    override fun onScroll(
+        e1: MotionEvent?,
+        e2: MotionEvent?,
+        distanceX: Float,
+        distanceY: Float
+    ): Boolean {
+
+        var y: Float = -1 * distanceY
+
+//        if(e2!!.action==MotionEvent.ACTION_UP){
+//
+//        }
+
+        Log.i("event",e1!!.action.toString())
+        Log.i("event",e2!!.action.toString())
+
+
+        if (bottomSheet.translationY > 100 && y < 0) { // Yukarı çektiğimde
+            bottomSheet.translationY += y
+            isExpand=true
+        } else if (y > 0 && bottomSheet.scrollY==0) { // Aşağı çektiğimde
+            bottomSheet.translationY += y
+            isExpand = false
         }
+        toolbar.alpha = (translateExpandLimit/bottomSheet.translationY)
+        return true
     }
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        super.dispatchTouchEvent(ev)
+        if(ev!!.action==MotionEvent.ACTION_UP){
+//            Log.i("press", "eee")
+            if (!isExpand) { // Aşağı çekildiğinde
+                collapse()
+            } else if(isExpand) { //yukarı çekildiğinde
+                expand()
+            }
+        }
 
-    override fun onShowPress(p0: MotionEvent?) {
-        Log.i("TAG", "onShowPress")
+
+
+        return gestureDetector.onTouchEvent(ev)
     }
 
     override fun onSingleTapUp(p0: MotionEvent?): Boolean {
@@ -49,58 +133,18 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onFling(e1: MotionEvent?, e2: MotionEvent?, p2: Float, p3: Float): Boolean {
 
-        Log.e("OnFling","e1.y"+e1!!.y)
-        Log.e("OnFling","e2.y"+e2!!.y)
+        Log.e("OnFling", "e1.y" + e1!!.y)
+        Log.e("OnFling", "e2.y" + e2!!.y)
 
         return true
-        /*
-        return when (getDirection(e1!!.x, e1.y, e2!!.x, e2.y)) {
-            Direction.TOP -> {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                true
-            }
-            Direction.LEFT -> true
-            Direction.DOWN -> {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                true
-            }
-            Direction.RIGHT -> true
-            else -> false
-        }
-
-         */
-
-
     }
 
-    override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, p2: Float, p3: Float): Boolean {
-
-        e1?.y?.let { startPos->
-            e2?.y?.let { endPos->
-                val fark = startPos - endPos
-                bottomSheetBehavior.peekHeight =  fark.toInt()
-            }
-        }
-        val startPos =
-        return true
+    override fun onShowPress(p0: MotionEvent?) {
+        Log.i("TAG", "onShowPress")
     }
 
     override fun onLongPress(p0: MotionEvent?) {
         Log.i("TAG", "onLongPress")
     }
 
-
-    private fun getDirection(
-        x1: Float,
-        y1: Float,
-        x2: Float,
-        y2: Float
-    ): Direction? {
-        val angle =
-            Math.toDegrees(atan2(y1 - y2.toDouble(), x2 - x1.toDouble()))
-        if (angle > 45 && angle <= 135) return Direction.TOP
-        if (angle >= 135 && angle < 180 || angle < -135 && angle > -180) return Direction.LEFT
-        if (angle < -45 && angle >= -135) return Direction.DOWN
-        return if (angle > -45 && angle <= 45) Direction.RIGHT else null
-    }
 }
