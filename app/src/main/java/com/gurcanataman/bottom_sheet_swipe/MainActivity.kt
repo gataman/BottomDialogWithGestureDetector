@@ -87,10 +87,6 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
         var y: Float = -1 * distanceY
 
-//        if(e2!!.action==MotionEvent.ACTION_UP){
-//
-//        }
-
         Log.i("event",e1!!.action.toString())
         Log.i("event",e2!!.action.toString())
 
@@ -108,7 +104,6 @@ class MainActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         super.dispatchTouchEvent(ev)
         if(ev!!.action==MotionEvent.ACTION_UP){
-//            Log.i("press", "eee")
             if (!isExpand) { // Aşağı çekildiğinde
                 collapse()
             } else if(isExpand) { //yukarı çekildiğinde
